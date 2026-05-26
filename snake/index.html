@@ -1,1591 +1,1477 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Snake That Seduced Eve</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Snake That Seduced Eve</title>
 
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-        body {
-            width: 100vw;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: linear-gradient(135deg, #1a0033 0%, #330066 50%, #1a0033 100%);
-            font-family: 'Courier New', monospace;
-            color: #00ff00;
-            overflow: hidden;
-        }
+body {
+    width: 100vw;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #1a0033 0%, #330066 50%, #1a0033 100%);
+    font-family: 'Courier New', monospace;
+    color: #00ff00;
+    overflow: hidden;
+}
 
-        .container {
-            width: 80vw;
-            max-width: 1100px;
-            height: 95vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 14px;
-            background: #000000;
-            border: 4px solid #00ff00;
-            box-shadow: 0 0 16px #00ff00, inset 0 0 14px rgba(0, 255, 0, 0.1);
-            padding: 18px;
-            border-radius: 8px;
-        }
+.container {
+    width: 80vw;
+    max-width: 1100px;
+    height: 95vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    background: #000;
+    border: 4px solid #00ff00;
+    box-shadow: 0 0 16px #00ff00, inset 0 0 14px rgba(0,255,0,.1);
+    padding: 18px;
+    border-radius: 8px;
+}
 
-        h1 {
-            font-size: clamp(1.6rem, 3.5vw, 3rem);
-            text-align: center;
-            text-shadow: 0 0 10px #00ff00, 0 0 16px #00ff00;
-            letter-spacing: 3px;
-            line-height: 1.1;
-        }
+h1 {
+    font-size: clamp(1.6rem, 3.5vw, 3rem);
+    text-align: center;
+    text-shadow: 0 0 10px #00ff00, 0 0 16px #00ff00;
+    letter-spacing: 3px;
+    line-height: 1.1;
+}
 
-        .scorecard {
-            width: 70%;
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            font-size: 1.05em;
-        }
+.scorecard {
+    width: 70%;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    font-size: 1.05em;
+}
 
-        .score-item {
-            flex: 1;
-            min-width: 250px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            border: 2px solid #ff00ff;
-            padding: 12px 16px;
-            background: rgba(255, 0, 255, 0.1);
-            box-shadow: 0 0 8px #ff00ff;
-        }
+.score-item {
+    flex: 1;
+    min-width: 250px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: 2px solid #ff00ff;
+    padding: 12px 16px;
+    background: rgba(255,0,255,.1);
+    box-shadow: 0 0 8px #ff00ff;
+}
 
-        .score-label {
-            font-size: clamp(0.65rem, 1vw, 0.9rem);
-            color: #00ffff;
-            margin-bottom: 6px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            text-align: center;
-            white-space: nowrap;
-        }
+.score-label {
+    font-size: clamp(.65rem, 1vw, .9rem);
+    color: #00ffff;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-align: center;
+    white-space: nowrap;
+}
 
-        .score-value {
-            font-size: clamp(1.3rem, 2.2vw, 1.9rem);
-            color: #ffff00;
-            font-weight: bold;
-            text-shadow: 0 0 5px #ffff00;
-        }
+.score-value {
+    font-size: clamp(1.3rem, 2.2vw, 1.9rem);
+    color: #ffff00;
+    font-weight: bold;
+    text-shadow: 0 0 5px #ffff00;
+}
 
-        #gameCanvas {
-            width: 80%;
-            max-width: 960px;
-            max-height: 520px;
-            flex: 1;
-            min-height: 0;
-            border: 3px solid #00ff00;
-            background: #1a1a1a;
-            box-shadow: 0 0 14px rgba(0, 255, 0, 0.45);
-            image-rendering: pixelated;
-            display: block;
-        }
+#gameCanvas {
+    width: 80%;
+    max-width: 960px;
+    max-height: 520px;
+    flex: 1;
+    min-height: 0;
+    border: 3px solid #00ff00;
+    background: #1a1a1a;
+    box-shadow: 0 0 14px rgba(0,255,0,.45);
+    image-rendering: pixelated;
+    display: block;
+}
 
-        .button-group {
-            display: flex;
-            gap: 22px;
-            justify-content: center;
-            align-items: center;
-            margin-top: 4px;
-            margin-bottom: 2px;
-            flex-wrap: wrap;
-        }
+.button-group {
+    display: flex;
+    gap: 22px;
+    justify-content: center;
+    align-items: center;
+    margin-top: 4px;
+    margin-bottom: 2px;
+    flex-wrap: wrap;
+}
 
-        button {
-            padding: 11px 30px;
-            font-size: clamp(0.85rem, 1.1vw, 1rem);
-            font-family: 'Courier New', monospace;
-            background: linear-gradient(135deg, #ff00ff, #00ffff);
-            color: #000000;
-            border: 2px solid #ffff00;
-            cursor: pointer;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            box-shadow: 0 0 8px #ff00ff;
-            transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
-        }
+button {
+    padding: 11px 30px;
+    font-size: clamp(.85rem, 1.1vw, 1rem);
+    font-family: 'Courier New', monospace;
+    background: linear-gradient(135deg, #ff00ff, #00ffff);
+    color: #000;
+    border: 2px solid #ffff00;
+    cursor: pointer;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    box-shadow: 0 0 8px #ff00ff;
+    transition: transform .15s, box-shadow .15s, background .15s;
+}
 
-        button:hover {
-            background: linear-gradient(135deg, #ffff00, #ff00ff);
-            box-shadow: 0 0 14px #ffff00;
-            transform: scale(1.03);
-        }
+button:hover {
+    background: linear-gradient(135deg, #ffff00, #ff00ff);
+    box-shadow: 0 0 14px #ffff00;
+    transform: scale(1.03);
+}
 
-        button:active {
-            transform: scale(0.96);
-        }
+button:active {
+    transform: scale(.96);
+}
 
-        .game-over-screen {
-            display: none;
-            position: fixed;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.95);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-        }
+.game-over-screen,
+.rapture-warning,
+.hell-challenge-screen {
+    display: none;
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,.95);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    text-align: center;
+}
 
-        .game-over-screen.active {
-            display: flex;
-        }
+.game-over-screen.active,
+.rapture-warning.active,
+.hell-challenge-screen.active {
+    display: flex;
+}
 
-        .game-over-content {
-            width: 80vw;
-            max-width: 1100px;
-            min-height: 80vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            gap: 18px;
-            text-align: center;
-            border: 4px solid #00ff00;
-            padding: 34px;
-            background: rgba(0, 0, 0, 0.98);
-            box-shadow: 0 0 24px #00ff00, inset 0 0 16px rgba(0, 255, 0, 0.1);
-        }
+.game-over-content {
+    width: 80vw;
+    max-width: 1100px;
+    min-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 18px;
+    text-align: center;
+    border: 4px solid #00ff00;
+    padding: 34px;
+    background: rgba(0,0,0,.98);
+    box-shadow: 0 0 24px #00ff00, inset 0 0 16px rgba(0,255,0,.1);
+}
 
-        .game-over-content h2 {
-            font-size: clamp(2rem, 4.5vw, 4.5rem);
-            color: #00ff00;
-            text-shadow: 0 0 16px #00ff00;
-            letter-spacing: 4px;
-            line-height: 1.1;
-        }
+.game-over-content h2 {
+    font-size: clamp(2rem, 4.5vw, 4.5rem);
+    color: #00ff00;
+    text-shadow: 0 0 16px #00ff00;
+    letter-spacing: 4px;
+    line-height: 1.1;
+}
 
-        .final-score {
-            font-size: clamp(1rem, 1.8vw, 1.6rem);
-            color: #ffff00;
-            text-shadow: 0 0 7px #ffff00;
-        }
+.final-score {
+    font-size: clamp(1rem, 1.8vw, 1.6rem);
+    color: #ffff00;
+    text-shadow: 0 0 7px #ffff00;
+}
 
-        .philosophy-quote {
-            width: 90%;
-            max-width: 900px;
-            font-size: clamp(0.95rem, 2vw, 1.9rem);
-            color: #00ffff;
-            font-style: italic;
-            padding: 20px;
-            border-left: 5px solid #00ffff;
-            background: rgba(0, 255, 255, 0.12);
-            line-height: 1.35;
-            text-shadow: 0 0 8px #00ffff;
-            overflow-wrap: break-word;
-            max-height: 38vh;
-            overflow-y: auto;
-        }
+.philosophy-quote {
+    width: 90%;
+    max-width: 900px;
+    font-size: clamp(.95rem, 2vw, 1.9rem);
+    color: #00ffff;
+    font-style: italic;
+    padding: 20px;
+    border-left: 5px solid #00ffff;
+    background: rgba(0,255,255,.12);
+    line-height: 1.35;
+    text-shadow: 0 0 8px #00ffff;
+    overflow-wrap: break-word;
+    max-height: 38vh;
+    overflow-y: auto;
+}
 
-        .rapture-warning,
-        .hell-challenge-screen {
-            display: none;
-            position: fixed;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.95);
-            z-index: 1001;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            gap: 34px;
-            padding: 30px;
-            text-align: center;
-            overflow: hidden;
-        }
+.rapture-warning,
+.hell-challenge-screen {
+    z-index: 1001;
+    gap: 34px;
+    padding: 30px;
+    overflow: hidden;
+}
 
-        .rapture-warning.active,
-        .hell-challenge-screen.active {
-            display: flex;
-        }
+.rapture-title {
+    width: min(92vw, 1100px);
+    font-size: clamp(2rem, 7vw, 5.2rem);
+    color: #ff0000;
+    text-shadow: 0 0 20px #ff0000, 0 0 36px #ff0000;
+    font-weight: bold;
+    letter-spacing: clamp(1px, .6vw, 4px);
+    line-height: 1.12;
+    animation: raptureFlash .45s infinite;
+}
 
-        .rapture-title {
-            width: min(92vw, 1100px);
-            font-size: clamp(2rem, 7vw, 5.2rem);
-            color: #ff0000;
-            text-shadow: 0 0 20px #ff0000, 0 0 36px #ff0000;
-            font-weight: bold;
-            letter-spacing: clamp(1px, 0.6vw, 4px);
-            line-height: 1.12;
-            text-align: center;
-            animation: raptureFlash 0.45s infinite;
-        }
+.rapture-instructions {
+    width: min(90vw, 900px);
+    font-size: clamp(1rem, 3.2vw, 2rem);
+    color: #ffff00;
+    text-shadow: 0 0 12px #ffff00;
+    font-weight: bold;
+    letter-spacing: 2px;
+    line-height: 1.35;
+}
 
-        .rapture-instructions {
-            width: min(90vw, 900px);
-            font-size: clamp(1rem, 3.2vw, 2rem);
-            color: #ffff00;
-            text-shadow: 0 0 12px #ffff00;
-            font-weight: bold;
-            letter-spacing: 2px;
-            line-height: 1.35;
-            text-align: center;
-        }
+.hell-message-box {
+    width: min(92vw, 1000px);
+    border: 4px solid #ff0000;
+    background: rgba(0,0,0,.96);
+    box-shadow: 0 0 26px #ff0000, inset 0 0 18px rgba(255,0,0,.2);
+    padding: clamp(24px, 5vw, 48px);
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    align-items: center;
+    justify-content: center;
+}
 
-        .hell-message-box {
-            width: min(92vw, 1000px);
-            border: 4px solid #ff0000;
-            background: rgba(0, 0, 0, 0.96);
-            box-shadow: 0 0 26px #ff0000, inset 0 0 18px rgba(255, 0, 0, 0.2);
-            padding: clamp(24px, 5vw, 48px);
-            display: flex;
-            flex-direction: column;
-            gap: 22px;
-            align-items: center;
-            justify-content: center;
-        }
+.hell-red-main {
+    color: #ff0000;
+    font-size: clamp(1.8rem, 5.5vw, 4.6rem);
+    line-height: 1.05;
+    font-weight: bold;
+    text-shadow: 0 0 18px #ff0000, 0 0 34px #ff0000;
+    letter-spacing: 3px;
+}
 
-        .hell-red-main {
-            color: #ff0000;
-            font-size: clamp(1.8rem, 5.5vw, 4.6rem);
-            line-height: 1.05;
-            font-weight: bold;
-            text-shadow: 0 0 18px #ff0000, 0 0 34px #ff0000;
-            letter-spacing: 3px;
-        }
+.hell-yellow {
+    color: #ffff00;
+    font-size: clamp(1.1rem, 3vw, 2rem);
+    line-height: 1.3;
+    font-weight: bold;
+    text-shadow: 0 0 12px #ffff00;
+    letter-spacing: 1px;
+}
 
-        .hell-yellow {
-            color: #ffff00;
-            font-size: clamp(1.1rem, 3vw, 2rem);
-            line-height: 1.3;
-            font-weight: bold;
-            text-shadow: 0 0 12px #ffff00;
-            letter-spacing: 1px;
-        }
+.hell-pink {
+    color: #ff00ff;
+    font-size: clamp(1rem, 2.8vw, 1.8rem);
+    line-height: 1.3;
+    font-weight: bold;
+    text-shadow: 0 0 12px #ff00ff;
+    letter-spacing: 1px;
+}
 
-        .hell-pink {
-            color: #ff00ff;
-            font-size: clamp(1rem, 2.8vw, 1.8rem);
-            line-height: 1.3;
-            font-weight: bold;
-            text-shadow: 0 0 12px #ff00ff;
-            letter-spacing: 1px;
-        }
+.hell-red-small {
+    color: #ff0000;
+    font-size: clamp(1rem, 2.6vw, 1.6rem);
+    line-height: 1.3;
+    font-weight: bold;
+    text-shadow: 0 0 12px #ff0000;
+    letter-spacing: 1px;
+}
 
-        .hell-red-small {
-            color: #ff0000;
-            font-size: clamp(1rem, 2.6vw, 1.6rem);
-            line-height: 1.3;
-            font-weight: bold;
-            text-shadow: 0 0 12px #ff0000;
-            letter-spacing: 1px;
-        }
+@keyframes raptureFlash {
+    0%, 49%, 100% { opacity: 1; }
+    50%, 99% { opacity: .35; }
+}
 
-        @keyframes raptureFlash {
-            0%, 49%, 100% {
-                opacity: 1;
-            }
-            50%, 99% {
-                opacity: 0.35;
-            }
-        }
+@media (max-width: 900px) {
+    body {
+        overflow-y: auto;
+    }
 
-        @media (max-width: 900px) {
-            body {
-                overflow-y: auto;
-            }
+    .container {
+        width: 95vw;
+        height: 95vh;
+        padding: 14px;
+    }
 
-            .container {
-                width: 95vw;
-                height: 95vh;
-                padding: 14px;
-            }
+    .scorecard {
+        width: 90%;
+        flex-direction: column;
+        gap: 10px;
+    }
 
-            .scorecard {
-                width: 90%;
-                flex-direction: column;
-                gap: 10px;
-            }
+    .score-item {
+        min-width: unset;
+        width: 100%;
+    }
 
-            .score-item {
-                min-width: unset;
-                width: 100%;
-            }
+    #gameCanvas {
+        width: 95%;
+        max-height: 460px;
+    }
 
-            #gameCanvas {
-                width: 95%;
-                max-height: 460px;
-            }
+    .game-over-content {
+        width: 95vw;
+        min-height: 85vh;
+        padding: 22px;
+    }
 
-            .game-over-content {
-                width: 95vw;
-                min-height: 85vh;
-                padding: 22px;
-            }
+    .philosophy-quote {
+        width: 95%;
+        font-size: clamp(.85rem, 3.4vw, 1.25rem);
+        padding: 16px;
+        max-height: 32vh;
+    }
 
-            .philosophy-quote {
-                width: 95%;
-                font-size: clamp(0.85rem, 3.4vw, 1.25rem);
-                padding: 16px;
-                max-height: 32vh;
-                overflow-y: auto;
-            }
-
-            .hell-message-box {
-                gap: 16px;
-            }
-        }
-    </style>
+    .hell-message-box {
+        gap: 16px;
+    }
+}
+</style>
 </head>
 
 <body>
-    <audio id="eatSFX" src="eat.mp3" preload="auto"></audio>
-    <audio id="gameOverSFX" src="gameover.mp3" preload="auto"></audio>
+<audio id="eatSFX" src="eat.mp3" preload="auto"></audio>
+<audio id="gameOverSFX" src="gameover.mp3" preload="auto"></audio>
 
-    <div class="container">
-        <h1>THE SNAKE THAT SEDUCED EVE</h1>
+<div class="container">
+    <h1>THE SNAKE THAT SEDUCED EVE</h1>
 
-        <div class="scorecard">
-            <div class="score-item">
-                <div class="score-label">Forbidden Fruits Eaten</div>
-                <div class="score-value" id="score">0</div>
-            </div>
-
-            <div class="score-item">
-                <div class="score-label">Most Original Sins Committed</div>
-                <div class="score-value" id="highScore">0</div>
-            </div>
+    <div class="scorecard">
+        <div class="score-item">
+            <div class="score-label">Forbidden Fruits Eaten</div>
+            <div class="score-value" id="score">0</div>
         </div>
 
-        <canvas id="gameCanvas"></canvas>
-
-        <div class="button-group">
-            <button onclick="startGame()">EAT NOW</button>
-            <button onclick="startRaptureMode()">RAPTURE</button>
+        <div class="score-item">
+            <div class="score-label">Most Original Sins Committed</div>
+            <div class="score-value" id="highScore">0</div>
         </div>
     </div>
 
-    <div class="game-over-screen" id="gameOverScreen">
-        <div class="game-over-content">
-            <h2>GOD CASTS YOU OUT OF EDEN</h2>
-            <p class="final-score">FORBIDDEN FRUITS EATEN: <span id="finalScore">0</span></p>
-            <div class="philosophy-quote" id="philosophyQuote"></div>
-            <button onclick="startGame()">START A NEW EDEN</button>
-        </div>
+    <canvas id="gameCanvas"></canvas>
+
+    <div class="button-group">
+        <button onclick="startGame()">EAT NOW</button>
+        <button onclick="startRaptureMode()">RAPTURE</button>
     </div>
+</div>
 
-    <div class="rapture-warning" id="raptureWarning">
-        <div class="rapture-title">THE RAPTURE IS COMING.<br>THE RAPTURE IS COMING.</div>
-        <div class="rapture-instructions">AVOID THE RED APPLES AT ALL COSTS.<br>PRESS AN ARROW KEY TO CONTINUE.</div>
+<div class="game-over-screen" id="gameOverScreen">
+    <div class="game-over-content">
+        <h2>GOD CASTS YOU OUT OF EDEN</h2>
+        <p class="final-score">FORBIDDEN FRUITS EATEN: <span id="finalScore">0</span></p>
+        <div class="philosophy-quote" id="philosophyQuote"></div>
+        <button onclick="startGame()">START A NEW EDEN</button>
     </div>
+</div>
 
-    <div class="hell-challenge-screen" id="hellChallengeScreen">
-        <div class="hell-message-box" id="hellMessageBox"></div>
-    </div>
+<div class="rapture-warning" id="raptureWarning">
+    <div class="rapture-title">THE RAPTURE IS COMING.<br>THE RAPTURE IS COMING.</div>
+    <div class="rapture-instructions">AVOID THE RED APPLES AT ALL COSTS.<br>PRESS AN ARROW KEY TO CONTINUE.</div>
+</div>
 
-    <script>
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d', { alpha: false });
+<div class="hell-challenge-screen" id="hellChallengeScreen">
+    <div class="hell-message-box" id="hellMessageBox"></div>
+</div>
 
-        const scoreDisplay = document.getElementById('score');
-        const highScoreDisplay = document.getElementById('highScore');
-        const gameOverScreen = document.getElementById('gameOverScreen');
-        const raptureWarning = document.getElementById('raptureWarning');
-        const hellChallengeScreen = document.getElementById('hellChallengeScreen');
-        const hellMessageBox = document.getElementById('hellMessageBox');
+<script>
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d', { alpha: false });
 
-        const eatSFX = document.getElementById('eatSFX');
-        const gameOverSFX = document.getElementById('gameOverSFX');
+const scoreDisplay = document.getElementById('score');
+const highScoreDisplay = document.getElementById('highScore');
+const gameOverScreen = document.getElementById('gameOverScreen');
+const raptureWarning = document.getElementById('raptureWarning');
+const hellChallengeScreen = document.getElementById('hellChallengeScreen');
+const hellMessageBox = document.getElementById('hellMessageBox');
 
-        const gridSize = 20;
+const eatSFX = document.getElementById('eatSFX');
+const gameOverSFX = document.getElementById('gameOverSFX');
 
-        const startSpeed = 110;
-        const raptureStartSpeed = 96;
-        const minSpeed = 58;
-        const speedStep = 7;
-        const fruitsPerSpeedUp = 5;
+const gridSize = 20;
 
-        const maxCursedUpdatesPerTick = 8;
+const startSpeed = 110;
+const raptureStartSpeed = 96;
+const minSpeed = 58;
+const speedStep = 7;
+const fruitsPerSpeedUp = 5;
 
-        const inversionFirstTriggerScore = 13;
-        const inversionCycleGap = 13;
-        const inversionDurationFruits = 6;
+const maxCursedUpdatesPerTick = 5;
 
-        const raptureStages = [
-            {
-                minScore: 0,
-                cursedFruitCount: 1,
-                moveInterval: 8,
-                chaseChance: 0.10,
-                bigChance: 0,
-                maxBigFruits: 0,
-                glitchChance: 0,
-                glitchCooldown: 999,
-                glitchShiftMax: 0
-            },
-            {
-                minScore: 3,
-                cursedFruitCount: 3,
-                moveInterval: 7,
-                chaseChance: 0.25,
-                bigChance: 0.10,
-                maxBigFruits: 1,
-                glitchChance: 0.02,
-                glitchCooldown: 18,
-                glitchShiftMax: 2
-            },
-            {
-                minScore: 6,
-                cursedFruitCount: 5,
-                moveInterval: 6,
-                chaseChance: 0.38,
-                bigChance: 0.15,
-                maxBigFruits: 2,
-                glitchChance: 0.04,
-                glitchCooldown: 15,
-                glitchShiftMax: 3
-            },
-            {
-                minScore: 10,
-                cursedFruitCount: 8,
-                moveInterval: 5,
-                chaseChance: 0.50,
-                bigChance: 0.20,
-                maxBigFruits: 2,
-                glitchChance: 0.06,
-                glitchCooldown: 13,
-                glitchShiftMax: 4
-            },
-            {
-                minScore: 15,
-                cursedFruitCount: 12,
-                moveInterval: 4,
-                chaseChance: 0.62,
-                bigChance: 0.24,
-                maxBigFruits: 3,
-                glitchChance: 0.08,
-                glitchCooldown: 11,
-                glitchShiftMax: 4
-            },
-            {
-                minScore: 22,
-                cursedFruitCount: 18,
-                moveInterval: 4,
-                chaseChance: 0.70,
-                bigChance: 0.28,
-                maxBigFruits: 4,
-                glitchChance: 0.10,
-                glitchCooldown: 9,
-                glitchShiftMax: 5
-            },
-            {
-                minScore: 30,
-                cursedFruitCount: 24,
-                moveInterval: 3,
-                chaseChance: 0.78,
-                bigChance: 0.30,
-                maxBigFruits: 5,
-                glitchChance: 0.12,
-                glitchCooldown: 8,
-                glitchShiftMax: 5
-            },
-            {
-                minScore: 40,
-                cursedFruitCount: 30,
-                moveInterval: 3,
-                chaseChance: 0.84,
-                bigChance: 0.32,
-                maxBigFruits: 6,
-                glitchChance: 0.14,
-                glitchCooldown: 7,
-                glitchShiftMax: 6
-            }
-        ];
+const inversionFirstTriggerScore = 6;
+const inversionCycleGap = 6;
+const inversionDurationFruits = 6;
 
-        let tileCountX = 40;
-        let tileCountY = 25;
+const raptureStages = [
+    { minScore: 0, cursedFruitCount: 1, moveInterval: 8, chaseChance: .10, bigChance: 0, maxBigFruits: 0, glitchChance: 0, glitchCooldown: 999, glitchShiftMax: 0 },
+    { minScore: 3, cursedFruitCount: 3, moveInterval: 7, chaseChance: .25, bigChance: .10, maxBigFruits: 1, glitchChance: .02, glitchCooldown: 18, glitchShiftMax: 2 },
+    { minScore: 6, cursedFruitCount: 5, moveInterval: 6, chaseChance: .38, bigChance: .15, maxBigFruits: 2, glitchChance: .04, glitchCooldown: 15, glitchShiftMax: 3 },
+    { minScore: 10, cursedFruitCount: 8, moveInterval: 5, chaseChance: .50, bigChance: .20, maxBigFruits: 2, glitchChance: .06, glitchCooldown: 13, glitchShiftMax: 4 },
+    { minScore: 15, cursedFruitCount: 12, moveInterval: 4, chaseChance: .62, bigChance: .24, maxBigFruits: 3, glitchChance: .08, glitchCooldown: 11, glitchShiftMax: 4 },
+    { minScore: 22, cursedFruitCount: 18, moveInterval: 4, chaseChance: .70, bigChance: .28, maxBigFruits: 4, glitchChance: .10, glitchCooldown: 9, glitchShiftMax: 5 },
+    { minScore: 30, cursedFruitCount: 24, moveInterval: 3, chaseChance: .78, bigChance: .30, maxBigFruits: 5, glitchChance: .12, glitchCooldown: 8, glitchShiftMax: 5 },
+    { minScore: 40, cursedFruitCount: 30, moveInterval: 3, chaseChance: .84, bigChance: .32, maxBigFruits: 6, glitchChance: .14, glitchCooldown: 7, glitchShiftMax: 6 }
+];
 
-        let snake = [{ x: 10, y: 10 }];
-        let food = { x: 15, y: 15 };
-        let cursedFruits = [];
+let tileCountX = 40;
+let tileCountY = 25;
 
-        let direction = { x: 1, y: 0 };
-        let nextDirection = { x: 1, y: 0 };
+let snake = [{ x: 10, y: 10 }];
+let food = { x: 15, y: 15 };
+let cursedFruits = [];
 
-        let score = 0;
-        let highScore = Number(localStorage.getItem('snakeHighScore')) || 0;
+let direction = { x: 1, y: 0 };
+let nextDirection = { x: 1, y: 0 };
 
-        let gameRunning = false;
-        let gamePaused = false;
-        let gameStarted = false;
-        let isRaptureMode = false;
-        let showingRaptureWarning = false;
+let score = 0;
+let highScore = Number(localStorage.getItem('snakeHighScore')) || 0;
 
-        let controlsInverted = false;
-        let nextInversionTriggerScore = inversionFirstTriggerScore;
-        let inversionReturnScore = null;
-        let hellChallengeActive = false;
-        let hellChallengeType = '';
+let gameRunning = false;
+let gamePaused = false;
+let gameStarted = false;
+let isRaptureMode = false;
+let showingRaptureWarning = false;
 
-        let gameSpeed = startSpeed;
-        let gameTimer = null;
+let controlsInverted = false;
+let nextInversionTriggerScore = inversionFirstTriggerScore;
+let inversionReturnScore = null;
+let hellChallengeActive = false;
+let hellChallengeType = '';
 
-        let tickCount = 0;
-        let glitchTicks = 0;
-        let glitchCooldown = 0;
-        let activeGlitchText = '';
-        let currentStageIndex = 0;
-        let cursedUpdateCursor = 0;
+let gameSpeed = startSpeed;
+let gameTimer = null;
 
-        let gridCanvas = document.createElement('canvas');
-        let gridCtx = gridCanvas.getContext('2d', { alpha: false });
-        let gridNeedsRedraw = true;
+let tickCount = 0;
+let glitchTicks = 0;
+let glitchCooldown = 0;
+let activeGlitchText = '';
+let currentStageIndex = 0;
+let cursedUpdateCursor = 0;
 
-        const philosophyQuotes = [
-            '"BOOM TARAT-TARAT." — WILLIE REVILLAME',
-            '"PAG HINDI AKO PAPASOK, HINAHANAP NIYO AKO, DIBA? NGAYON PAPASOK AKO, TATANUNGIN N\'YO AKO BAKIT AKO PUMASOK?" — BATO DELA ROSA',
-            '"WALANG HIMALA!" — NORA AUNOR',
-            '"I DON’T CARE." — KRIS AQUINO',
-            '"LOVE LOVE LOVE!" — KRIS AQUINO',
-            '"DO NOT TOUCH MY COUNTRYMAN." — ROBIN PADILLA',
-            '"I DO NOT CARE ABOUT HUMAN RIGHTS, I CARE ABOUT HUMAN LIVES." — RODRIGO DUTERTE',
-            '"HELL IS OTHER PEOPLE." — JEAN-PAUL SARTRE',
-            '"MAN IS CONDEMNED TO BE FREE." — JEAN-PAUL SARTRE',
-            '"GOD IS DEAD. GOD REMAINS DEAD. AND WE HAVE KILLED HIM." — FRIEDRICH NIETZSCHE',
-            '"HE WHO HAS A WHY TO LIVE CAN BEAR ALMOST ANY HOW." — FRIEDRICH NIETZSCHE',
-            '"THE UNEXAMINED LIFE IS NOT WORTH LIVING." — SOCRATES',
-            '"ANXIETY IS THE DIZZINESS OF FREEDOM." — SØREN KIERKEGAARD',
-            '"NO MAN EVER STEPS IN THE SAME RIVER TWICE." — HERACLITUS',
-            '"THE STRUGGLE ITSELF TOWARD THE HEIGHTS IS ENOUGH TO FILL A MAN’S HEART." — ALBERT CAMUS',
-            '"IN THE DAY THAT YOU EAT FROM IT YOU WILL CERTAINLY DIE." — GENESIS 2:17',
-            '"THE SERPENT DECEIVED ME, AND I ATE." — GENESIS 3:13',
-            '"DUST YOU ARE AND TO DUST YOU WILL RETURN." — GENESIS 3:19',
-            '"SIN IS CROUCHING AT YOUR DOOR." — GENESIS 4:7',
-            '"VANITY OF VANITIES; ALL IS VANITY." — ECCLESIASTES 1:2',
-            '"THE WAGES OF SIN IS DEATH." — ROMANS 6:23',
-            '"LET THE DEAD BURY THEIR DEAD." — MATTHEW 8:22'
-        ];
+const gridCanvas = document.createElement('canvas');
+const gridCtx = gridCanvas.getContext('2d', { alpha: false });
+let gridNeedsRedraw = true;
 
-        const glitchTexts = [
-            'THE SERPENT MOVES YOU',
-            'EDEN SHIFTS',
-            'DO NOT LOOK BACK',
-            'SIN REWRITES THE MAP',
-            'YOU WERE NEVER IN CONTROL',
-            'FATHER, I THIRST',
-            'THE FRUIT REMEMBERS',
-            'YOUR PATH HAS BEEN FORGIVEN, THEN REVOKED',
-            'THE GARDEN BLINKED',
-            'A MOUTH OPENS IN THE GRID',
-            'THE APPLE DREAMS OF BLOOD',
-            'YOUR BODY IS NOT WHERE YOU LEFT IT',
-            'THE SNAKE PRAYS BACKWARDS',
-            'PARADISE MISPLACED YOU',
-            'THE EXIT MOVED',
-            'HEAVEN BUFFERING',
-            'THE COMMANDMENT HAS UPDATED',
-            'YOU HAVE BEEN RECALCULATED',
-            'THE CURSE HAS AUTOSAVED',
-            'GOD IS WATCHING IN LOW RESOLUTION',
-            'THE MAP CONFESSES',
-            'YOUR SHADOW ATE FIRST',
-            'THE ANGEL MISCLICKED',
-            'THE WALLS ARE LEARNING',
-            'YOU ARE BEING PATCHED',
-            'THE GARDEN HAS NO UNDO',
-            'THE FRUIT IS CLOSER THAN IT APPEARS',
-            'EDEN DOES NOT SUPPORT REFUNDS'
-        ];
+const philosophyQuotes = [
+    '"BOOM TARAT-TARAT." — WILLIE REVILLAME',
+    '"WALANG HIMALA!" — NORA AUNOR',
+    '"I DON’T CARE." — KRIS AQUINO',
+    '"LOVE LOVE LOVE!" — KRIS AQUINO',
+    '"HELL IS OTHER PEOPLE." — JEAN-PAUL SARTRE',
+    '"MAN IS CONDEMNED TO BE FREE." — JEAN-PAUL SARTRE',
+    '"GOD IS DEAD. GOD REMAINS DEAD. AND WE HAVE KILLED HIM." — FRIEDRICH NIETZSCHE',
+    '"HE WHO HAS A WHY TO LIVE CAN BEAR ALMOST ANY HOW." — FRIEDRICH NIETZSCHE',
+    '"THE UNEXAMINED LIFE IS NOT WORTH LIVING." — SOCRATES',
+    '"ANXIETY IS THE DIZZINESS OF FREEDOM." — SØREN KIERKEGAARD',
+    '"NO MAN EVER STEPS IN THE SAME RIVER TWICE." — HERACLITUS',
+    '"THE STRUGGLE ITSELF TOWARD THE HEIGHTS IS ENOUGH TO FILL A MAN’S HEART." — ALBERT CAMUS',
+    '"IN THE DAY THAT YOU EAT FROM IT YOU WILL CERTAINLY DIE." — GENESIS 2:17',
+    '"THE SERPENT DECEIVED ME, AND I ATE." — GENESIS 3:13',
+    '"DUST YOU ARE AND TO DUST YOU WILL RETURN." — GENESIS 3:19',
+    '"SIN IS CROUCHING AT YOUR DOOR." — GENESIS 4:7',
+    '"VANITY OF VANITIES; ALL IS VANITY." — ECCLESIASTES 1:2',
+    '"THE WAGES OF SIN IS DEATH." — ROMANS 6:23',
+    '"LET THE DEAD BURY THEIR DEAD." — MATTHEW 8:22'
+];
 
-        const stageMessages = [
-            '',
-            'THE GARDEN HAS CHANGED',
-            'THE CURSE HAS LEARNED YOUR NAME',
-            'EDEN REJECTS THE BODY',
-            'THE RAPTURE IS ACTIVE',
-            'THE APPLES HAVE EYES',
-            'THE WALLS BEGIN TO HUNT',
-            'THERE IS NO GARDEN LEFT'
-        ];
+const glitchTexts = [
+    'THE SERPENT MOVES YOU',
+    'EDEN SHIFTS',
+    'DO NOT LOOK BACK',
+    'SIN REWRITES THE MAP',
+    'YOU WERE NEVER IN CONTROL',
+    'FATHER, I THIRST',
+    'THE FRUIT REMEMBERS',
+    'THE GARDEN BLINKED',
+    'THE APPLE DREAMS OF BLOOD',
+    'THE SNAKE PRAYS BACKWARDS',
+    'PARADISE MISPLACED YOU',
+    'HEAVEN BUFFERING',
+    'THE COMMANDMENT HAS UPDATED',
+    'YOU HAVE BEEN RECALCULATED',
+    'THE CURSE HAS AUTOSAVED',
+    'GOD IS WATCHING IN LOW RESOLUTION',
+    'THE ANGEL MISCLICKED',
+    'THE WALLS ARE LEARNING',
+    'THE GARDEN HAS NO UNDO'
+];
 
-        const colors = {
-            snake: '#00ff00',
-            snakeHead: '#ffff00',
-            food: '#ff00ff',
-            cursedFood: '#ff0000',
-            cursedBig: '#ff3300',
-            background: '#1a1a1a',
-            grid: '#003300'
-        };
+const stageMessages = [
+    '',
+    'THE GARDEN HAS CHANGED',
+    'THE CURSE HAS LEARNED YOUR NAME',
+    'EDEN REJECTS THE BODY',
+    'THE RAPTURE IS ACTIVE',
+    'THE APPLES HAVE EYES',
+    'THE WALLS BEGIN TO HUNT',
+    'THERE IS NO GARDEN LEFT'
+];
 
-        eatSFX.volume = 0.45;
-        gameOverSFX.volume = 0.55;
-        highScoreDisplay.textContent = highScore;
+const colors = {
+    snake: '#00ff00',
+    snakeHead: '#ffff00',
+    food: '#ff00ff',
+    cursedFood: '#ff0000',
+    cursedBig: '#ff3300',
+    background: '#1a1a1a',
+    grid: '#003300'
+};
 
-        function getRandomQuote() {
-            return philosophyQuotes[Math.floor(Math.random() * philosophyQuotes.length)];
+eatSFX.volume = .45;
+gameOverSFX.volume = .55;
+highScoreDisplay.textContent = highScore;
+
+function getRandomQuote() {
+    return philosophyQuotes[Math.floor(Math.random() * philosophyQuotes.length)];
+}
+
+function playSound(sound) {
+    try {
+        sound.pause();
+        sound.currentTime = 0;
+        const playPromise = sound.play();
+        if (playPromise !== undefined) {
+            playPromise.catch(() => {});
+        }
+    } catch (error) {}
+}
+
+function playCrunchSound() {
+    playSound(eatSFX);
+}
+
+function playExplosionSound() {
+    playSound(gameOverSFX);
+}
+
+function clearGameTimer() {
+    if (gameTimer) {
+        clearInterval(gameTimer);
+        gameTimer = null;
+    }
+}
+
+function startGameTimer() {
+    clearGameTimer();
+
+    gameTimer = setInterval(() => {
+        if (!gameRunning || gamePaused || !gameStarted || hellChallengeActive) return;
+        update();
+        draw();
+    }, gameSpeed);
+}
+
+function restartGameTimerWithNewSpeed() {
+    if (gameRunning && gameStarted && !gamePaused && !hellChallengeActive) {
+        startGameTimer();
+    }
+}
+
+function pauseForChallenge() {
+    gamePaused = true;
+    clearGameTimer();
+}
+
+function continueAfterChallenge() {
+    hellChallengeActive = false;
+    hellChallengeType = '';
+    hellChallengeScreen.classList.remove('active');
+    gamePaused = false;
+
+    if (gameRunning && gameStarted) {
+        startGameTimer();
+    }
+
+    draw();
+}
+
+function getNormalSpeedForCurrentScore() {
+    const speedDrops = Math.floor(score / fruitsPerSpeedUp) * speedStep;
+    const baseSpeed = isRaptureMode ? raptureStartSpeed : startSpeed;
+    const minimumSpeed = isRaptureMode ? minSpeed - 8 : minSpeed;
+    return Math.max(minimumSpeed, baseSpeed - speedDrops);
+}
+
+function showHellChallengeStart() {
+    hellChallengeActive = true;
+    hellChallengeType = 'start';
+    controlsInverted = true;
+    inversionReturnScore = score + inversionDurationFruits;
+
+    gameSpeed = startSpeed;
+
+    activeGlitchText = 'IN HELL, THEY WALK BACKWARDS';
+    glitchTicks = 3;
+
+    hellMessageBox.innerHTML = `
+        <div class="hell-red-main">IN HELL, THEY WALK BACKWARDS.</div>
+        <div class="hell-yellow">Up is down, down is up.</div>
+        <div class="hell-yellow">Left is right, right is left.</div>
+        <div class="hell-pink">Eat 6 more pink apples to return to earth.</div>
+        <div class="hell-red-small">Press space to continue.</div>
+    `;
+
+    pauseForChallenge();
+    draw();
+    hellChallengeScreen.classList.add('active');
+}
+
+function showHellChallengeEnd() {
+    hellChallengeActive = true;
+    hellChallengeType = 'end';
+    controlsInverted = false;
+    inversionReturnScore = null;
+    nextInversionTriggerScore = score + inversionCycleGap;
+
+    gameSpeed = getNormalSpeedForCurrentScore();
+
+    activeGlitchText = 'EVERYTHING IS FINE AGAIN';
+    glitchTicks = 3;
+
+    hellMessageBox.innerHTML = `
+        <div class="hell-red-main">EVERYTHING IS FINE AGAIN.</div>
+        <div class="hell-yellow">FOR NOW.</div>
+        <div class="hell-red-small">Press space to continue.</div>
+    `;
+
+    pauseForChallenge();
+    draw();
+    hellChallengeScreen.classList.add('active');
+}
+
+function resizeCanvas() {
+    const rect = canvas.getBoundingClientRect();
+
+    const rawWidth = Math.floor(rect.width / gridSize) * gridSize;
+    const rawHeight = Math.floor(rect.height / gridSize) * gridSize;
+
+    canvas.width = Math.max(rawWidth, 400);
+    canvas.height = Math.max(rawHeight, 300);
+
+    tileCountX = canvas.width / gridSize;
+    tileCountY = canvas.height / gridSize;
+
+    gridNeedsRedraw = true;
+    buildGridCanvas();
+    draw();
+}
+
+window.addEventListener('resize', () => {
+    clearGameTimer();
+    resizeCanvas();
+
+    if (gameRunning && gameStarted && !gamePaused && !hellChallengeActive) {
+        startGameTimer();
+    }
+});
+
+function buildGridCanvas() {
+    if (!gridNeedsRedraw) return;
+
+    gridCanvas.width = canvas.width;
+    gridCanvas.height = canvas.height;
+
+    gridCtx.fillStyle = colors.background;
+    gridCtx.fillRect(0, 0, gridCanvas.width, gridCanvas.height);
+
+    gridCtx.strokeStyle = colors.grid;
+    gridCtx.lineWidth = .5;
+    gridCtx.beginPath();
+
+    for (let x = 0; x <= tileCountX; x++) {
+        const px = x * gridSize + .5;
+        gridCtx.moveTo(px, 0);
+        gridCtx.lineTo(px, gridCanvas.height);
+    }
+
+    for (let y = 0; y <= tileCountY; y++) {
+        const py = y * gridSize + .5;
+        gridCtx.moveTo(0, py);
+        gridCtx.lineTo(gridCanvas.width, py);
+    }
+
+    gridCtx.stroke();
+    gridNeedsRedraw = false;
+}
+
+document.addEventListener('keydown', handleKeyPress);
+
+function handleKeyPress(e) {
+    const key = e.key.toUpperCase();
+
+    const isDirectionKey =
+        key === 'ARROWUP' ||
+        key === 'W' ||
+        key === 'ARROWDOWN' ||
+        key === 'S' ||
+        key === 'ARROWLEFT' ||
+        key === 'A' ||
+        key === 'ARROWRIGHT' ||
+        key === 'D';
+
+    if (hellChallengeActive) {
+        if (key === ' ') {
+            e.preventDefault();
+            continueAfterChallenge();
         }
 
-        function playSound(sound) {
-            try {
-                sound.pause();
-                sound.currentTime = 0;
+        return;
+    }
 
-                const playPromise = sound.play();
+    if (showingRaptureWarning && isDirectionKey) {
+        showingRaptureWarning = false;
+        raptureWarning.classList.remove('active');
+        gameStarted = true;
+        startGameTimer();
+        return;
+    }
 
-                if (playPromise !== undefined) {
-                    playPromise.catch(() => {});
-                }
-            } catch (error) {}
+    if (!gameStarted && gameRunning && isDirectionKey) {
+        gameStarted = true;
+        startGameTimer();
+    }
+
+    if (isDirectionKey) {
+        setNextDirectionFromKey(key);
+        return;
+    }
+
+    if (key === ' ') {
+        e.preventDefault();
+        togglePause();
+    }
+}
+
+function setNextDirectionFromKey(key) {
+    let desiredDirection = null;
+
+    if (!controlsInverted) {
+        if (key === 'ARROWUP' || key === 'W') desiredDirection = { x: 0, y: -1 };
+        if (key === 'ARROWDOWN' || key === 'S') desiredDirection = { x: 0, y: 1 };
+        if (key === 'ARROWLEFT' || key === 'A') desiredDirection = { x: -1, y: 0 };
+        if (key === 'ARROWRIGHT' || key === 'D') desiredDirection = { x: 1, y: 0 };
+    } else {
+        if (key === 'ARROWUP' || key === 'W') desiredDirection = { x: 0, y: 1 };
+        if (key === 'ARROWDOWN' || key === 'S') desiredDirection = { x: 0, y: -1 };
+        if (key === 'ARROWLEFT' || key === 'A') desiredDirection = { x: 1, y: 0 };
+        if (key === 'ARROWRIGHT' || key === 'D') desiredDirection = { x: -1, y: 0 };
+    }
+
+    if (!desiredDirection) return;
+
+    if (desiredDirection.x !== 0 && direction.x === 0) {
+        nextDirection = desiredDirection;
+    }
+
+    if (desiredDirection.y !== 0 && direction.y === 0) {
+        nextDirection = desiredDirection;
+    }
+}
+
+function togglePause() {
+    if (!gameRunning || hellChallengeActive) return;
+
+    gamePaused = !gamePaused;
+
+    if (gamePaused) {
+        clearGameTimer();
+    } else if (gameStarted) {
+        startGameTimer();
+    }
+
+    draw();
+}
+
+function resetChallengeState() {
+    controlsInverted = false;
+    nextInversionTriggerScore = inversionFirstTriggerScore;
+    inversionReturnScore = null;
+    hellChallengeActive = false;
+    hellChallengeType = '';
+    hellChallengeScreen.classList.remove('active');
+}
+
+function startGame() {
+    clearGameTimer();
+
+    snake = [{ x: Math.floor(tileCountX / 2), y: Math.floor(tileCountY / 2) }];
+
+    direction = { x: 1, y: 0 };
+    nextDirection = { x: 1, y: 0 };
+
+    score = 0;
+    tickCount = 0;
+    glitchTicks = 0;
+    glitchCooldown = 0;
+    currentStageIndex = 0;
+    cursedUpdateCursor = 0;
+    gameSpeed = startSpeed;
+    isRaptureMode = false;
+    cursedFruits = [];
+
+    resetChallengeState();
+    generateFood();
+    updateDisplay();
+
+    gameRunning = true;
+    gamePaused = false;
+    gameStarted = false;
+    showingRaptureWarning = false;
+
+    gameOverScreen.classList.remove('active');
+    raptureWarning.classList.remove('active');
+
+    draw();
+}
+
+function startRaptureMode() {
+    clearGameTimer();
+
+    snake = [{ x: Math.floor(tileCountX / 2), y: Math.floor(tileCountY / 2) }];
+
+    direction = { x: 1, y: 0 };
+    nextDirection = { x: 1, y: 0 };
+
+    score = 0;
+    tickCount = 0;
+    glitchTicks = 0;
+    glitchCooldown = 0;
+    currentStageIndex = 0;
+    cursedUpdateCursor = 0;
+    gameSpeed = raptureStartSpeed;
+    isRaptureMode = true;
+    cursedFruits = [];
+
+    resetChallengeState();
+    generateFood();
+    syncRaptureStage();
+    updateDisplay();
+
+    gameRunning = true;
+    gamePaused = false;
+    gameStarted = false;
+    showingRaptureWarning = true;
+
+    gameOverScreen.classList.remove('active');
+    raptureWarning.classList.add('active');
+
+    draw();
+}
+
+function resetGame() {
+    clearGameTimer();
+
+    snake = [{ x: Math.floor(tileCountX / 2), y: Math.floor(tileCountY / 2) }];
+
+    direction = { x: 1, y: 0 };
+    nextDirection = { x: 1, y: 0 };
+
+    score = 0;
+    tickCount = 0;
+    glitchTicks = 0;
+    glitchCooldown = 0;
+    currentStageIndex = 0;
+    cursedUpdateCursor = 0;
+    gameSpeed = startSpeed;
+    isRaptureMode = false;
+    cursedFruits = [];
+
+    resetChallengeState();
+
+    gameRunning = false;
+    gamePaused = false;
+    gameStarted = false;
+    showingRaptureWarning = false;
+
+    generateFood();
+    updateDisplay();
+
+    gameOverScreen.classList.remove('active');
+    raptureWarning.classList.remove('active');
+
+    draw();
+}
+
+function getRaptureStageIndex() {
+    let index = 0;
+
+    for (let i = 0; i < raptureStages.length; i++) {
+        if (score >= raptureStages[i].minScore) {
+            index = i;
         }
+    }
 
-        function playCrunchSound() {
-            playSound(eatSFX);
+    return index;
+}
+
+function getRaptureStage() {
+    return raptureStages[getRaptureStageIndex()];
+}
+
+function syncRaptureStage() {
+    if (!isRaptureMode) return;
+
+    const newStageIndex = getRaptureStageIndex();
+    const stage = raptureStages[newStageIndex];
+
+    if (newStageIndex !== currentStageIndex && stageMessages[newStageIndex]) {
+        activeGlitchText = stageMessages[newStageIndex];
+        glitchTicks = 2;
+        glitchCooldown = stage.glitchCooldown;
+    }
+
+    currentStageIndex = newStageIndex;
+
+    while (cursedFruits.length < stage.cursedFruitCount) {
+        cursedFruits.push(generateCursedFruit());
+    }
+
+    if (cursedFruits.length > stage.cursedFruitCount) {
+        cursedFruits.length = stage.cursedFruitCount;
+    }
+}
+
+function isCellOnSnake(x, y) {
+    for (let i = 0; i < snake.length; i++) {
+        if (snake[i].x === x && snake[i].y === y) return true;
+    }
+
+    return false;
+}
+
+function isCellOnFood(x, y) {
+    return food.x === x && food.y === y;
+}
+
+function cursedFruitTouchesCell(fruit, x, y) {
+    if (fruit.size <= 1) {
+        return fruit.x === x && fruit.y === y;
+    }
+
+    return Math.abs(fruit.x - x) <= 1 && Math.abs(fruit.y - y) <= 1;
+}
+
+function isCellOnCursedFruit(x, y, skipIndex = -1) {
+    for (let i = 0; i < cursedFruits.length; i++) {
+        if (i === skipIndex) continue;
+        if (cursedFruitTouchesCell(cursedFruits[i], x, y)) return true;
+    }
+
+    return false;
+}
+
+function isNearSnakeHead(x, y, radius) {
+    const head = snake[0];
+    return Math.abs(head.x - x) <= radius && Math.abs(head.y - y) <= radius;
+}
+
+function generateFood() {
+    let newX = 0;
+    let newY = 0;
+    let validPosition = false;
+    let attempts = 0;
+
+    while (!validPosition && attempts < 500) {
+        attempts++;
+
+        newX = Math.floor(Math.random() * tileCountX);
+        newY = Math.floor(Math.random() * tileCountY);
+
+        validPosition =
+            !isCellOnSnake(newX, newY) &&
+            !isCellOnCursedFruit(newX, newY);
+    }
+
+    food.x = newX;
+    food.y = newY;
+}
+
+function generateCursedFruit() {
+    let newX = 0;
+    let newY = 0;
+    let validPosition = false;
+    let attempts = 0;
+
+    while (!validPosition && attempts < 500) {
+        attempts++;
+
+        newX = Math.floor(Math.random() * tileCountX);
+        newY = Math.floor(Math.random() * tileCountY);
+
+        validPosition =
+            !isCellOnSnake(newX, newY) &&
+            !isCellOnFood(newX, newY) &&
+            !isCellOnCursedFruit(newX, newY) &&
+            !isNearSnakeHead(newX, newY, 4);
+    }
+
+    return {
+        x: newX,
+        y: newY,
+        size: 1,
+        bigTicks: 0
+    };
+}
+
+function countBigCursedFruits() {
+    let count = 0;
+
+    for (let i = 0; i < cursedFruits.length; i++) {
+        if (cursedFruits[i].size > 1) count++;
+    }
+
+    return count;
+}
+
+function isValidCursedFruitPosition(x, y, size, skipIndex) {
+    if (x < 0 || x >= tileCountX || y < 0 || y >= tileCountY) return false;
+    if (isCellOnFood(x, y)) return false;
+    if (isCellOnCursedFruit(x, y, skipIndex)) return false;
+
+    for (let i = 0; i < snake.length; i++) {
+        if (size > 1) {
+            if (Math.abs(snake[i].x - x) <= 1 && Math.abs(snake[i].y - y) <= 1) return false;
+        } else if (snake[i].x === x && snake[i].y === y) {
+            return false;
         }
+    }
 
-        function playExplosionSound() {
-            playSound(gameOverSFX);
-        }
+    return true;
+}
 
-        function clearGameTimer() {
-            if (gameTimer) {
-                clearInterval(gameTimer);
-                gameTimer = null;
-            }
-        }
+function updateCursedFruits() {
+    if (!isRaptureMode || showingRaptureWarning || cursedFruits.length === 0) return;
 
-        function startGameTimer() {
-            clearGameTimer();
+    const stage = getRaptureStage();
 
-            gameTimer = setInterval(() => {
-                if (!gameRunning || gamePaused || !gameStarted || hellChallengeActive) return;
+    updateBigFruitTimers(stage);
 
-                update();
-                draw();
-            }, gameSpeed);
-        }
+    if (tickCount % stage.moveInterval !== 0) return;
 
-        function restartGameTimerWithNewSpeed() {
-            if (gameRunning && gameStarted && !gamePaused && !hellChallengeActive) {
-                startGameTimer();
-            }
-        }
+    const updates = Math.min(maxCursedUpdatesPerTick, cursedFruits.length);
+    const snakeHead = snake[0];
 
-        function pauseForChallenge() {
-            gamePaused = true;
-            clearGameTimer();
-        }
+    for (let n = 0; n < updates; n++) {
+        const i = cursedUpdateCursor % cursedFruits.length;
+        cursedUpdateCursor++;
 
-        function continueAfterChallenge() {
-            hellChallengeActive = false;
-            hellChallengeType = '';
-            hellChallengeScreen.classList.remove('active');
-            gamePaused = false;
+        const fruit = cursedFruits[i];
 
-            if (gameRunning && gameStarted) {
-                startGameTimer();
-            }
+        maybeMakeCursedFruitBig(fruit, stage);
 
-            draw();
-        }
+        let newX = fruit.x;
+        let newY = fruit.y;
 
-        function showHellChallengeStart() {
-            hellChallengeActive = true;
-            hellChallengeType = 'start';
-            controlsInverted = true;
-            inversionReturnScore = score + inversionDurationFruits;
+        const roll = Math.random();
 
-            activeGlitchText = 'IN HELL, THEY WALK BACKWARDS';
-            glitchTicks = 4;
-
-            hellMessageBox.innerHTML = `
-                <div class="hell-red-main">IN HELL, THEY WALK BACKWARDS.</div>
-                <div class="hell-yellow">Up is down, down is up.</div>
-                <div class="hell-yellow">Left is right, right is left.</div>
-                <div class="hell-pink">Eat 6 more pink apples to return to earth.</div>
-                <div class="hell-red-small">Press space to continue.</div>
-            `;
-
-            pauseForChallenge();
-            draw();
-            hellChallengeScreen.classList.add('active');
-        }
-
-        function showHellChallengeEnd() {
-            hellChallengeActive = true;
-            hellChallengeType = 'end';
-            controlsInverted = false;
-            inversionReturnScore = null;
-            nextInversionTriggerScore = score + inversionCycleGap;
-
-            activeGlitchText = 'EVERYTHING IS FINE AGAIN';
-            glitchTicks = 3;
-
-            hellMessageBox.innerHTML = `
-                <div class="hell-red-main">EVERYTHING IS FINE AGAIN.</div>
-                <div class="hell-yellow">FOR NOW.</div>
-                <div class="hell-red-small">Press space to continue.</div>
-            `;
-
-            pauseForChallenge();
-            draw();
-            hellChallengeScreen.classList.add('active');
-        }
-
-        function resizeCanvas() {
-            const rect = canvas.getBoundingClientRect();
-
-            const rawWidth = Math.floor(rect.width / gridSize) * gridSize;
-            const rawHeight = Math.floor(rect.height / gridSize) * gridSize;
-
-            canvas.width = Math.max(rawWidth, 400);
-            canvas.height = Math.max(rawHeight, 300);
-
-            tileCountX = canvas.width / gridSize;
-            tileCountY = canvas.height / gridSize;
-
-            gridNeedsRedraw = true;
-            buildGridCanvas();
-            draw();
-        }
-
-        window.addEventListener('resize', () => {
-            clearGameTimer();
-            resizeCanvas();
-
-            if (gameRunning && gameStarted && !gamePaused && !hellChallengeActive) {
-                startGameTimer();
-            }
-        });
-
-        function buildGridCanvas() {
-            if (!gridNeedsRedraw) return;
-
-            gridCanvas.width = canvas.width;
-            gridCanvas.height = canvas.height;
-
-            gridCtx.fillStyle = colors.background;
-            gridCtx.fillRect(0, 0, gridCanvas.width, gridCanvas.height);
-
-            gridCtx.strokeStyle = colors.grid;
-            gridCtx.lineWidth = 0.5;
-            gridCtx.beginPath();
-
-            for (let x = 0; x <= tileCountX; x++) {
-                const px = x * gridSize + 0.5;
-                gridCtx.moveTo(px, 0);
-                gridCtx.lineTo(px, gridCanvas.height);
-            }
-
-            for (let y = 0; y <= tileCountY; y++) {
-                const py = y * gridSize + 0.5;
-                gridCtx.moveTo(0, py);
-                gridCtx.lineTo(gridCanvas.width, py);
-            }
-
-            gridCtx.stroke();
-            gridNeedsRedraw = false;
-        }
-
-        document.addEventListener('keydown', handleKeyPress);
-
-        function handleKeyPress(e) {
-            const key = e.key.toUpperCase();
-
-            const isDirectionKey =
-                key === 'ARROWUP' ||
-                key === 'W' ||
-                key === 'ARROWDOWN' ||
-                key === 'S' ||
-                key === 'ARROWLEFT' ||
-                key === 'A' ||
-                key === 'ARROWRIGHT' ||
-                key === 'D';
-
-            if (hellChallengeActive) {
-                if (key === ' ') {
-                    e.preventDefault();
-                    continueAfterChallenge();
-                }
-
-                return;
-            }
-
-            if (showingRaptureWarning && isDirectionKey) {
-                showingRaptureWarning = false;
-                raptureWarning.classList.remove('active');
-                gameStarted = true;
-                startGameTimer();
-                return;
-            }
-
-            if (!gameStarted && gameRunning && isDirectionKey) {
-                gameStarted = true;
-                startGameTimer();
-            }
-
-            if (isDirectionKey) {
-                setNextDirectionFromKey(key);
-                return;
-            }
-
-            if (key === ' ') {
-                e.preventDefault();
-                togglePause();
-            }
-        }
-
-        function setNextDirectionFromKey(key) {
-            let desiredDirection = null;
-
-            if (!controlsInverted) {
-                if (key === 'ARROWUP' || key === 'W') desiredDirection = { x: 0, y: -1 };
-                if (key === 'ARROWDOWN' || key === 'S') desiredDirection = { x: 0, y: 1 };
-                if (key === 'ARROWLEFT' || key === 'A') desiredDirection = { x: -1, y: 0 };
-                if (key === 'ARROWRIGHT' || key === 'D') desiredDirection = { x: 1, y: 0 };
+        if (roll < stage.chaseChance) {
+            if (Math.abs(snakeHead.x - fruit.x) > Math.abs(snakeHead.y - fruit.y)) {
+                newX += snakeHead.x > fruit.x ? 1 : -1;
             } else {
-                if (key === 'ARROWUP' || key === 'W') desiredDirection = { x: 0, y: 1 };
-                if (key === 'ARROWDOWN' || key === 'S') desiredDirection = { x: 0, y: -1 };
-                if (key === 'ARROWLEFT' || key === 'A') desiredDirection = { x: 1, y: 0 };
-                if (key === 'ARROWRIGHT' || key === 'D') desiredDirection = { x: -1, y: 0 };
+                newY += snakeHead.y > fruit.y ? 1 : -1;
             }
-
-            if (!desiredDirection) return;
-
-            if (desiredDirection.x !== 0 && direction.x === 0) {
-                nextDirection = desiredDirection;
-            }
-
-            if (desiredDirection.y !== 0 && direction.y === 0) {
-                nextDirection = desiredDirection;
-            }
+        } else if (roll < .94) {
+            const dir = Math.floor(Math.random() * 4);
+            if (dir === 0) newX += 1;
+            if (dir === 1) newX -= 1;
+            if (dir === 2) newY += 1;
+            if (dir === 3) newY -= 1;
+        } else {
+            newX = Math.floor(Math.random() * tileCountX);
+            newY = Math.floor(Math.random() * tileCountY);
         }
 
-        function togglePause() {
-            if (!gameRunning || hellChallengeActive) return;
-
-            gamePaused = !gamePaused;
-
-            if (gamePaused) {
-                clearGameTimer();
-            } else if (gameStarted) {
-                startGameTimer();
-            }
-
-            draw();
+        if (isValidCursedFruitPosition(newX, newY, fruit.size, i)) {
+            fruit.x = newX;
+            fruit.y = newY;
         }
+    }
+}
 
-        function resetChallengeState() {
-            controlsInverted = false;
-            nextInversionTriggerScore = inversionFirstTriggerScore;
-            inversionReturnScore = null;
-            hellChallengeActive = false;
-            hellChallengeType = '';
-            hellChallengeScreen.classList.remove('active');
-        }
+function updateBigFruitTimers(stage) {
+    const limit = Math.min(cursedFruits.length, 30);
 
-        function startGame() {
-            clearGameTimer();
+    for (let i = 0; i < limit; i++) {
+        const fruit = cursedFruits[i];
 
-            snake = [{
-                x: Math.floor(tileCountX / 2),
-                y: Math.floor(tileCountY / 2)
-            }];
+        if (fruit.bigTicks > 0) {
+            fruit.bigTicks--;
 
-            direction = { x: 1, y: 0 };
-            nextDirection = { x: 1, y: 0 };
-
-            score = 0;
-            tickCount = 0;
-            glitchTicks = 0;
-            glitchCooldown = 0;
-            currentStageIndex = 0;
-            cursedUpdateCursor = 0;
-            gameSpeed = startSpeed;
-            isRaptureMode = false;
-            cursedFruits = [];
-
-            resetChallengeState();
-
-            generateFood();
-            updateDisplay();
-
-            gameRunning = true;
-            gamePaused = false;
-            gameStarted = false;
-            showingRaptureWarning = false;
-
-            gameOverScreen.classList.remove('active');
-            raptureWarning.classList.remove('active');
-
-            draw();
-        }
-
-        function startRaptureMode() {
-            clearGameTimer();
-
-            snake = [{
-                x: Math.floor(tileCountX / 2),
-                y: Math.floor(tileCountY / 2)
-            }];
-
-            direction = { x: 1, y: 0 };
-            nextDirection = { x: 1, y: 0 };
-
-            score = 0;
-            tickCount = 0;
-            glitchTicks = 0;
-            glitchCooldown = 0;
-            currentStageIndex = 0;
-            cursedUpdateCursor = 0;
-            gameSpeed = raptureStartSpeed;
-            isRaptureMode = true;
-            cursedFruits = [];
-
-            resetChallengeState();
-
-            generateFood();
-            syncRaptureStage();
-
-            updateDisplay();
-
-            gameRunning = true;
-            gamePaused = false;
-            gameStarted = false;
-            showingRaptureWarning = true;
-
-            gameOverScreen.classList.remove('active');
-            raptureWarning.classList.add('active');
-
-            draw();
-        }
-
-        function resetGame() {
-            clearGameTimer();
-
-            snake = [{
-                x: Math.floor(tileCountX / 2),
-                y: Math.floor(tileCountY / 2)
-            }];
-
-            direction = { x: 1, y: 0 };
-            nextDirection = { x: 1, y: 0 };
-
-            score = 0;
-            tickCount = 0;
-            glitchTicks = 0;
-            glitchCooldown = 0;
-            currentStageIndex = 0;
-            cursedUpdateCursor = 0;
-            gameSpeed = startSpeed;
-            isRaptureMode = false;
-            cursedFruits = [];
-
-            resetChallengeState();
-
-            gameRunning = false;
-            gamePaused = false;
-            gameStarted = false;
-            showingRaptureWarning = false;
-
-            generateFood();
-            updateDisplay();
-
-            gameOverScreen.classList.remove('active');
-            raptureWarning.classList.remove('active');
-
-            draw();
-        }
-
-        function getRaptureStageIndex() {
-            let index = 0;
-
-            for (let i = 0; i < raptureStages.length; i++) {
-                if (score >= raptureStages[i].minScore) {
-                    index = i;
-                }
-            }
-
-            return index;
-        }
-
-        function getRaptureStage() {
-            return raptureStages[getRaptureStageIndex()];
-        }
-
-        function syncRaptureStage() {
-            if (!isRaptureMode) return;
-
-            const newStageIndex = getRaptureStageIndex();
-            const stage = raptureStages[newStageIndex];
-
-            if (newStageIndex !== currentStageIndex && stageMessages[newStageIndex]) {
-                activeGlitchText = stageMessages[newStageIndex];
-                glitchTicks = 2;
-                glitchCooldown = stage.glitchCooldown;
-            }
-
-            currentStageIndex = newStageIndex;
-
-            while (cursedFruits.length < stage.cursedFruitCount) {
-                cursedFruits.push(generateCursedFruit());
-            }
-
-            if (cursedFruits.length > stage.cursedFruitCount) {
-                cursedFruits.length = stage.cursedFruitCount;
+            if (fruit.bigTicks <= 0) {
+                fruit.size = 1;
             }
         }
+    }
+}
 
-        function isCellOnSnake(x, y) {
-            for (let i = 0; i < snake.length; i++) {
-                if (snake[i].x === x && snake[i].y === y) return true;
-            }
-            return false;
-        }
+function maybeMakeCursedFruitBig(fruit, stage) {
+    if (fruit.size > 1) return;
+    if (stage.maxBigFruits <= 0) return;
+    if (countBigCursedFruits() >= stage.maxBigFruits) return;
+    if (Math.random() >= stage.bigChance) return;
+    if (isNearSnakeHead(fruit.x, fruit.y, 3)) return;
 
-        function isCellOnFood(x, y) {
-            return food.x === x && food.y === y;
-        }
+    fruit.size = 2;
+    fruit.bigTicks = 5 + Math.floor(Math.random() * 5);
+}
 
-        function isCellOnCursedFruit(x, y, skipIndex = -1) {
-            for (let i = 0; i < cursedFruits.length; i++) {
-                if (i === skipIndex) continue;
-                if (cursedFruitTouchesCell(cursedFruits[i], x, y)) return true;
-            }
-            return false;
-        }
+function checkCursedFruitCollision(headX, headY) {
+    if (!isRaptureMode || showingRaptureWarning) return false;
 
-        function isNearSnakeHead(x, y, radius) {
-            const head = snake[0];
-            return Math.abs(head.x - x) <= radius && Math.abs(head.y - y) <= radius;
-        }
-
-        function generateFood() {
-            let newX = 0;
-            let newY = 0;
-            let validPosition = false;
-            let attempts = 0;
-
-            while (!validPosition && attempts < 500) {
-                attempts++;
-
-                newX = Math.floor(Math.random() * tileCountX);
-                newY = Math.floor(Math.random() * tileCountY);
-
-                validPosition =
-                    !isCellOnSnake(newX, newY) &&
-                    !isCellOnCursedFruit(newX, newY);
-            }
-
-            food.x = newX;
-            food.y = newY;
-        }
-
-        function generateCursedFruit() {
-            let newX = 0;
-            let newY = 0;
-            let validPosition = false;
-            let attempts = 0;
-
-            while (!validPosition && attempts < 500) {
-                attempts++;
-
-                newX = Math.floor(Math.random() * tileCountX);
-                newY = Math.floor(Math.random() * tileCountY);
-
-                validPosition =
-                    !isCellOnSnake(newX, newY) &&
-                    !isCellOnFood(newX, newY) &&
-                    !isCellOnCursedFruit(newX, newY) &&
-                    !isNearSnakeHead(newX, newY, 4);
-            }
-
-            return {
-                x: newX,
-                y: newY,
-                size: 1,
-                bigTicks: 0
-            };
-        }
-
-        function countBigCursedFruits() {
-            let count = 0;
-
-            for (let i = 0; i < cursedFruits.length; i++) {
-                if (cursedFruits[i].size > 1) count++;
-            }
-
-            return count;
-        }
-
-        function cursedFruitTouchesCell(fruit, x, y) {
-            if (fruit.size <= 1) {
-                return fruit.x === x && fruit.y === y;
-            }
-
-            return Math.abs(fruit.x - x) <= 1 && Math.abs(fruit.y - y) <= 1;
-        }
-
-        function isValidCursedFruitPosition(x, y, size, skipIndex) {
-            if (x < 0 || x >= tileCountX || y < 0 || y >= tileCountY) return false;
-            if (isCellOnFood(x, y)) return false;
-            if (isCellOnCursedFruit(x, y, skipIndex)) return false;
-
-            for (let i = 0; i < snake.length; i++) {
-                if (size > 1) {
-                    if (Math.abs(snake[i].x - x) <= 1 && Math.abs(snake[i].y - y) <= 1) return false;
-                } else if (snake[i].x === x && snake[i].y === y) {
-                    return false;
-                }
-            }
-
+    for (let i = 0; i < cursedFruits.length; i++) {
+        if (cursedFruitTouchesCell(cursedFruits[i], headX, headY)) {
             return true;
         }
+    }
 
-        function updateCursedFruits() {
-            if (!isRaptureMode || showingRaptureWarning || cursedFruits.length === 0) return;
+    return false;
+}
 
-            const stage = getRaptureStage();
+function maybeTriggerGlitch() {
+    if (!isRaptureMode || showingRaptureWarning || glitchTicks > 0 || hellChallengeActive) return;
 
-            updateBigFruitTimers(stage);
+    const stage = getRaptureStage();
 
-            if (tickCount % stage.moveInterval !== 0) return;
+    if (stage.glitchChance <= 0) return;
 
-            const updates = Math.min(maxCursedUpdatesPerTick, cursedFruits.length);
-            const snakeHead = snake[0];
+    if (glitchCooldown > 0) {
+        glitchCooldown--;
+        return;
+    }
 
-            for (let n = 0; n < updates; n++) {
-                const i = cursedUpdateCursor % cursedFruits.length;
-                cursedUpdateCursor++;
+    if (Math.random() < stage.glitchChance) {
+        glitchTicks = 2;
+        glitchCooldown = stage.glitchCooldown + Math.floor(Math.random() * 4);
+        activeGlitchText = glitchTexts[Math.floor(Math.random() * glitchTexts.length)];
+        displaceSnakeSafely(stage.glitchShiftMax);
+    }
+}
 
-                const fruit = cursedFruits[i];
+function displaceSnakeSafely(shiftMax) {
+    if (!isRaptureMode || snake.length === 0 || shiftMax <= 0) return;
 
-                maybeMakeCursedFruitBig(fruit, stage);
+    const offsets = [];
 
-                let newX = fruit.x;
-                let newY = fruit.y;
-
-                const roll = Math.random();
-
-                if (roll < stage.chaseChance) {
-                    if (Math.abs(snakeHead.x - fruit.x) > Math.abs(snakeHead.y - fruit.y)) {
-                        newX += snakeHead.x > fruit.x ? 1 : -1;
-                    } else {
-                        newY += snakeHead.y > fruit.y ? 1 : -1;
-                    }
-                } else if (roll < 0.94) {
-                    const dir = Math.floor(Math.random() * 4);
-                    if (dir === 0) newX += 1;
-                    if (dir === 1) newX -= 1;
-                    if (dir === 2) newY += 1;
-                    if (dir === 3) newY -= 1;
-                } else {
-                    newX = Math.floor(Math.random() * tileCountX);
-                    newY = Math.floor(Math.random() * tileCountY);
-                }
-
-                if (isValidCursedFruitPosition(newX, newY, fruit.size, i)) {
-                    fruit.x = newX;
-                    fruit.y = newY;
-                }
-            }
+    for (let dx = -shiftMax; dx <= shiftMax; dx++) {
+        for (let dy = -shiftMax; dy <= shiftMax; dy++) {
+            if (dx === 0 && dy === 0) continue;
+            if (Math.abs(dx) + Math.abs(dy) < 2) continue;
+            offsets.push({ dx, dy });
         }
+    }
 
-        function updateBigFruitTimers(stage) {
-            const limit = Math.min(cursedFruits.length, 30);
+    for (let i = offsets.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        const temp = offsets[i];
+        offsets[i] = offsets[j];
+        offsets[j] = temp;
+    }
 
-            for (let i = 0; i < limit; i++) {
-                const fruit = cursedFruits[i];
+    for (let i = 0; i < offsets.length; i++) {
+        const dx = offsets[i].dx;
+        const dy = offsets[i].dy;
 
-                if (fruit.bigTicks > 0) {
-                    fruit.bigTicks--;
-
-                    if (fruit.bigTicks <= 0) {
-                        fruit.size = 1;
-                    }
-                }
-            }
-        }
-
-        function maybeMakeCursedFruitBig(fruit, stage) {
-            if (fruit.size > 1) return;
-            if (stage.maxBigFruits <= 0) return;
-            if (countBigCursedFruits() >= stage.maxBigFruits) return;
-            if (Math.random() >= stage.bigChance) return;
-            if (isNearSnakeHead(fruit.x, fruit.y, 3)) return;
-
-            fruit.size = 2;
-            fruit.bigTicks = 5 + Math.floor(Math.random() * 5);
-        }
-
-        function checkCursedFruitCollision(headX, headY) {
-            if (!isRaptureMode || showingRaptureWarning) return false;
-
-            for (let i = 0; i < cursedFruits.length; i++) {
-                if (cursedFruitTouchesCell(cursedFruits[i], headX, headY)) {
-                    return true;
-                }
+        if (canShiftSnake(dx, dy)) {
+            for (let s = 0; s < snake.length; s++) {
+                snake[s].x += dx;
+                snake[s].y += dy;
             }
 
+            return;
+        }
+    }
+}
+
+function canShiftSnake(dx, dy) {
+    for (let i = 0; i < snake.length; i++) {
+        const newX = snake[i].x + dx;
+        const newY = snake[i].y + dy;
+
+        if (newX < 0 || newX >= tileCountX || newY < 0 || newY >= tileCountY) {
             return false;
         }
 
-        function maybeTriggerGlitch() {
-            if (!isRaptureMode || showingRaptureWarning || glitchTicks > 0 || hellChallengeActive) return;
-
-            const stage = getRaptureStage();
-
-            if (stage.glitchChance <= 0) return;
-
-            if (glitchCooldown > 0) {
-                glitchCooldown--;
-                return;
-            }
-
-            if (Math.random() < stage.glitchChance) {
-                glitchTicks = 3 + Math.floor(Math.random() * 2);
-                glitchCooldown = stage.glitchCooldown + Math.floor(Math.random() * 4);
-                activeGlitchText = glitchTexts[Math.floor(Math.random() * glitchTexts.length)];
-
-                displaceSnakeSafely(stage.glitchShiftMax);
+        for (let c = 0; c < cursedFruits.length; c++) {
+            if (cursedFruitTouchesCell(cursedFruits[c], newX, newY)) {
+                return false;
             }
         }
+    }
 
-        function displaceSnakeSafely(shiftMax) {
-            if (!isRaptureMode || snake.length === 0 || shiftMax <= 0) return;
+    return true;
+}
 
-            const offsets = [];
+function maybeTriggerInversionChallenge() {
+    if (!isRaptureMode || hellChallengeActive) return;
 
-            for (let dx = -shiftMax; dx <= shiftMax; dx++) {
-                for (let dy = -shiftMax; dy <= shiftMax; dy++) {
-                    if (dx === 0 && dy === 0) continue;
-                    if (Math.abs(dx) + Math.abs(dy) < 2) continue;
+    if (!controlsInverted && nextInversionTriggerScore !== null && score >= nextInversionTriggerScore) {
+        showHellChallengeStart();
+        return;
+    }
 
-                    offsets.push({ dx, dy });
-                }
-            }
+    if (controlsInverted && inversionReturnScore !== null && score >= inversionReturnScore) {
+        showHellChallengeEnd();
+    }
+}
 
-            for (let i = offsets.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                const temp = offsets[i];
-                offsets[i] = offsets[j];
-                offsets[j] = temp;
-            }
+function update() {
+    tickCount++;
+    direction = nextDirection;
 
-            for (let i = 0; i < offsets.length; i++) {
-                const dx = offsets[i].dx;
-                const dy = offsets[i].dy;
+    const headX = snake[0].x + direction.x;
+    const headY = snake[0].y + direction.y;
 
-                if (canShiftSnake(dx, dy)) {
-                    for (let s = 0; s < snake.length; s++) {
-                        snake[s].x += dx;
-                        snake[s].y += dy;
-                    }
+    if (
+        headX < 0 ||
+        headX >= tileCountX ||
+        headY < 0 ||
+        headY >= tileCountY
+    ) {
+        endGame();
+        return;
+    }
 
-                    return;
-                }
-            }
+    for (let i = 0; i < snake.length; i++) {
+        if (snake[i].x === headX && snake[i].y === headY) {
+            endGame();
+            return;
+        }
+    }
+
+    if (checkCursedFruitCollision(headX, headY)) {
+        endGame();
+        return;
+    }
+
+    snake.unshift({ x: headX, y: headY });
+
+    if (headX === food.x && headY === food.y) {
+        score += 1;
+        playCrunchSound();
+
+        const targetSpeed = controlsInverted ? startSpeed : getNormalSpeedForCurrentScore();
+
+        if (targetSpeed !== gameSpeed) {
+            gameSpeed = targetSpeed;
+            restartGameTimerWithNewSpeed();
         }
 
-        function canShiftSnake(dx, dy) {
-            for (let i = 0; i < snake.length; i++) {
-                const newX = snake[i].x + dx;
-                const newY = snake[i].y + dy;
+        syncRaptureStage();
+        generateFood();
+        maybeTriggerInversionChallenge();
+    } else {
+        snake.pop();
+    }
 
-                if (newX < 0 || newX >= tileCountX || newY < 0 || newY >= tileCountY) {
-                    return false;
-                }
+    updateCursedFruits();
+    maybeTriggerGlitch();
+    updateDisplay();
+}
 
-                for (let c = 0; c < cursedFruits.length; c++) {
-                    if (cursedFruitTouchesCell(cursedFruits[c], newX, newY)) {
-                        return false;
-                    }
-                }
-            }
+function updateDisplay() {
+    scoreDisplay.textContent = score;
+    highScoreDisplay.textContent = highScore;
+}
 
-            return true;
+function draw() {
+    ctx.drawImage(gridCanvas, 0, 0);
+
+    if (glitchTicks > 0) {
+        drawGlitchBaseShift();
+    }
+
+    drawSnake();
+    drawFood();
+    drawCursedFruits();
+    drawGameText();
+
+    if (glitchTicks > 0) {
+        drawFullScreenGlitch();
+        glitchTicks--;
+    }
+}
+
+function drawSnake() {
+    for (let i = snake.length - 1; i >= 0; i--) {
+        const segment = snake[i];
+
+        ctx.fillStyle = i === 0 ? colors.snakeHead : colors.snake;
+
+        ctx.fillRect(
+            segment.x * gridSize + 1,
+            segment.y * gridSize + 1,
+            gridSize - 2,
+            gridSize - 2
+        );
+    }
+}
+
+function drawFood() {
+    ctx.fillStyle = colors.food;
+
+    ctx.beginPath();
+    ctx.arc(
+        food.x * gridSize + gridSize / 2,
+        food.y * gridSize + gridSize / 2,
+        gridSize / 2 - 2,
+        0,
+        Math.PI * 2
+    );
+    ctx.fill();
+}
+
+function drawCursedFruits() {
+    if (!isRaptureMode) return;
+
+    for (let i = 0; i < cursedFruits.length; i++) {
+        const fruit = cursedFruits[i];
+
+        ctx.fillStyle = fruit.size > 1 ? colors.cursedBig : colors.cursedFood;
+
+        const radius = fruit.size > 1 ? gridSize * 1.15 : gridSize / 2 - 2;
+
+        ctx.beginPath();
+        ctx.arc(
+            fruit.x * gridSize + gridSize / 2,
+            fruit.y * gridSize + gridSize / 2,
+            radius,
+            0,
+            Math.PI * 2
+        );
+        ctx.fill();
+
+        if (fruit.size > 1) {
+            ctx.strokeStyle = '#ffff00';
+            ctx.lineWidth = 2;
+            ctx.stroke();
         }
+    }
+}
 
-        function maybeTriggerInversionChallenge() {
-            if (!isRaptureMode || hellChallengeActive) return;
+function drawGameText() {
+    if (!gameStarted && gameRunning && !showingRaptureWarning) {
+        ctx.fillStyle = 'rgba(0,255,255,.85)';
+        ctx.font = 'bold 28px Courier New';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
 
-            if (!controlsInverted && nextInversionTriggerScore !== null && score >= nextInversionTriggerScore) {
-                showHellChallengeStart();
-                return;
-            }
+        ctx.fillText(
+            'PRESS ANY ARROW KEY TO BEGIN TEMPTATION',
+            canvas.width / 2,
+            canvas.height / 2
+        );
+    }
 
-            if (controlsInverted && inversionReturnScore !== null && score >= inversionReturnScore) {
-                showHellChallengeEnd();
-            }
-        }
+    if (gamePaused && !hellChallengeActive) {
+        ctx.fillStyle = 'rgba(255,0,255,.75)';
+        ctx.font = 'bold 42px Courier New';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
 
-        function update() {
-            tickCount++;
-            direction = nextDirection;
+        ctx.fillText(
+            'PAUSED',
+            canvas.width / 2,
+            canvas.height / 2
+        );
+    }
+}
 
-            const headX = snake[0].x + direction.x;
-            const headY = snake[0].y + direction.y;
+function drawGlitchBaseShift() {
+    ctx.save();
 
-            if (
-                headX < 0 ||
-                headX >= tileCountX ||
-                headY < 0 ||
-                headY >= tileCountY
-            ) {
-                endGame();
-                return;
-            }
+    const shiftX = Math.floor(Math.random() * 10) - 5;
+    const shiftY = Math.floor(Math.random() * 6) - 3;
 
-            for (let i = 0; i < snake.length; i++) {
-                if (snake[i].x === headX && snake[i].y === headY) {
-                    endGame();
-                    return;
-                }
-            }
+    ctx.globalAlpha = .18;
+    ctx.drawImage(gridCanvas, shiftX, shiftY);
 
-            if (checkCursedFruitCollision(headX, headY)) {
-                endGame();
-                return;
-            }
+    ctx.restore();
+}
 
-            snake.unshift({ x: headX, y: headY });
+function drawFullScreenGlitch() {
+    ctx.save();
 
-            if (headX === food.x && headY === food.y) {
-                score += 1;
-                playCrunchSound();
+    const bandCount = 5;
+    const sliceCount = 2;
 
-                if (score % fruitsPerSpeedUp === 0) {
-                    gameSpeed = Math.max(isRaptureMode ? minSpeed - 8 : minSpeed, gameSpeed - speedStep);
-                    restartGameTimerWithNewSpeed();
-                }
+    for (let i = 0; i < bandCount; i++) {
+        const y = Math.floor(Math.random() * canvas.height);
+        const h = 5 + Math.floor(Math.random() * 18);
 
-                syncRaptureStage();
-                generateFood();
-                maybeTriggerInversionChallenge();
-            } else {
-                snake.pop();
-            }
+        ctx.globalAlpha = .14;
+        ctx.fillStyle = i % 2 === 0 ? '#ff00ff' : '#00ffff';
+        ctx.fillRect(0, y, canvas.width, h);
+    }
 
-            updateCursedFruits();
-            maybeTriggerGlitch();
-            updateDisplay();
-        }
+    ctx.globalAlpha = .16;
 
-        function updateDisplay() {
-            scoreDisplay.textContent = score;
-            highScoreDisplay.textContent = highScore;
-        }
+    for (let i = 0; i < sliceCount; i++) {
+        const y = Math.floor(Math.random() * canvas.height);
+        const h = 8 + Math.floor(Math.random() * 14);
+        const xOffset = Math.floor(Math.random() * 44) - 22;
 
-        function draw() {
-            ctx.drawImage(gridCanvas, 0, 0);
+        ctx.drawImage(
+            canvas,
+            0,
+            y,
+            canvas.width,
+            h,
+            xOffset,
+            y,
+            canvas.width,
+            h
+        );
+    }
 
-            if (glitchTicks > 0) {
-                drawGlitchBaseShift();
-            }
+    ctx.globalAlpha = .10;
+    ctx.fillStyle = '#ff0000';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            drawSnake();
-            drawFood();
-            drawCursedFruits();
-            drawGameText();
+    ctx.globalAlpha = .95;
+    ctx.fillStyle = '#ffff00';
+    ctx.font = 'bold 24px Courier New';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
 
-            if (glitchTicks > 0) {
-                drawFullScreenGlitch();
-                glitchTicks--;
-            }
-        }
+    ctx.fillText(
+        activeGlitchText,
+        canvas.width / 2 + (Math.floor(Math.random() * 12) - 6),
+        canvas.height / 2 + (Math.floor(Math.random() * 12) - 6)
+    );
 
-        function drawSnake() {
-            for (let i = snake.length - 1; i >= 0; i--) {
-                const segment = snake[i];
+    ctx.restore();
+}
 
-                ctx.fillStyle = i === 0 ? colors.snakeHead : colors.snake;
+function endGame() {
+    clearGameTimer();
 
-                ctx.fillRect(
-                    segment.x * gridSize + 1,
-                    segment.y * gridSize + 1,
-                    gridSize - 2,
-                    gridSize - 2
-                );
-            }
-        }
+    gameRunning = false;
+    gameStarted = false;
+    hellChallengeActive = false;
+    controlsInverted = false;
 
-        function drawFood() {
-            ctx.fillStyle = colors.food;
+    playExplosionSound();
 
-            ctx.beginPath();
-            ctx.arc(
-                food.x * gridSize + gridSize / 2,
-                food.y * gridSize + gridSize / 2,
-                gridSize / 2 - 2,
-                0,
-                Math.PI * 2
-            );
-            ctx.fill();
-        }
+    if (score > highScore) {
+        highScore = score;
+        localStorage.setItem('snakeHighScore', highScore);
+    }
 
-        function drawCursedFruits() {
-            if (!isRaptureMode) return;
+    updateDisplay();
 
-            for (let i = 0; i < cursedFruits.length; i++) {
-                const fruit = cursedFruits[i];
+    document.getElementById('finalScore').textContent = score;
+    document.getElementById('philosophyQuote').textContent = getRandomQuote();
 
-                ctx.fillStyle = fruit.size > 1 ? colors.cursedBig : colors.cursedFood;
+    gameOverScreen.classList.add('active');
+    raptureWarning.classList.remove('active');
+    hellChallengeScreen.classList.remove('active');
 
-                const radius = fruit.size > 1 ? gridSize * 1.15 : gridSize / 2 - 2;
+    showingRaptureWarning = false;
+}
 
-                ctx.beginPath();
-                ctx.arc(
-                    fruit.x * gridSize + gridSize / 2,
-                    fruit.y * gridSize + gridSize / 2,
-                    radius,
-                    0,
-                    Math.PI * 2
-                );
-                ctx.fill();
-
-                if (fruit.size > 1) {
-                    ctx.strokeStyle = '#ffff00';
-                    ctx.lineWidth = 2;
-                    ctx.stroke();
-                }
-            }
-        }
-
-        function drawGameText() {
-            if (!gameStarted && gameRunning && !showingRaptureWarning) {
-                ctx.fillStyle = 'rgba(0, 255, 255, 0.85)';
-                ctx.font = 'bold 28px Courier New';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-
-                ctx.fillText(
-                    'PRESS ANY ARROW KEY TO BEGIN TEMPTATION',
-                    canvas.width / 2,
-                    canvas.height / 2
-                );
-            }
-
-            if (gamePaused && !hellChallengeActive) {
-                ctx.fillStyle = 'rgba(255, 0, 255, 0.75)';
-                ctx.font = 'bold 42px Courier New';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-
-                ctx.fillText(
-                    'PAUSED',
-                    canvas.width / 2,
-                    canvas.height / 2
-                );
-            }
-        }
-
-        function drawGlitchBaseShift() {
-            ctx.save();
-
-            const shiftX = Math.floor(Math.random() * 14) - 7;
-            const shiftY = Math.floor(Math.random() * 8) - 4;
-
-            ctx.globalAlpha = 0.24;
-            ctx.drawImage(gridCanvas, shiftX, shiftY);
-
-            ctx.globalAlpha = 0.12;
-            ctx.drawImage(gridCanvas, -shiftX, 0);
-
-            ctx.restore();
-        }
-
-        function drawFullScreenGlitch() {
-            ctx.save();
-
-            const bandCount = 8;
-            const sliceCount = 4;
-
-            for (let i = 0; i < bandCount; i++) {
-                const y = Math.floor(Math.random() * canvas.height);
-                const h = 5 + Math.floor(Math.random() * 22);
-
-                ctx.globalAlpha = 0.17;
-                ctx.fillStyle = i % 2 === 0 ? '#ff00ff' : '#00ffff';
-                ctx.fillRect(0, y, canvas.width, h);
-            }
-
-            ctx.globalAlpha = 0.20;
-
-            for (let i = 0; i < sliceCount; i++) {
-                const y = Math.floor(Math.random() * canvas.height);
-                const h = 8 + Math.floor(Math.random() * 18);
-                const xOffset = Math.floor(Math.random() * 70) - 35;
-
-                ctx.drawImage(
-                    canvas,
-                    0,
-                    y,
-                    canvas.width,
-                    h,
-                    xOffset,
-                    y,
-                    canvas.width,
-                    h
-                );
-            }
-
-            ctx.globalAlpha = 0.14;
-            ctx.fillStyle = '#ff0000';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            ctx.globalAlpha = 0.95;
-            ctx.fillStyle = '#ffff00';
-            ctx.font = 'bold 24px Courier New';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-
-            ctx.fillText(
-                activeGlitchText,
-                canvas.width / 2 + (Math.floor(Math.random() * 16) - 8),
-                canvas.height / 2 + (Math.floor(Math.random() * 16) - 8)
-            );
-
-            ctx.restore();
-        }
-
-        function endGame() {
-            clearGameTimer();
-
-            gameRunning = false;
-            gameStarted = false;
-            hellChallengeActive = false;
-            controlsInverted = false;
-
-            playExplosionSound();
-
-            if (score > highScore) {
-                highScore = score;
-                localStorage.setItem('snakeHighScore', highScore);
-            }
-
-            updateDisplay();
-
-            document.getElementById('finalScore').textContent = score;
-            document.getElementById('philosophyQuote').textContent = getRandomQuote();
-
-            gameOverScreen.classList.add('active');
-            raptureWarning.classList.remove('active');
-            hellChallengeScreen.classList.remove('active');
-
-            showingRaptureWarning = false;
-        }
-
-        resizeCanvas();
-        resetGame();
-    </script>
+resizeCanvas();
+resetGame();
+</script>
 </body>
 </html>
